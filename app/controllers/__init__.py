@@ -1,0 +1,7 @@
+from controllers.species import SpeciesController
+from controllers.property import PropertyController
+from controllers.value import ValueController
+from controllers.description import DescriptionController
+from controllers.assignment import AssignmentController
+from controllers.completeness import CompletenessController
+from controllers.solver import SolverController
