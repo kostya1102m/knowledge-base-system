@@ -6,10 +6,12 @@ authors = [
     {name = "mercury",email = "122353133+kostya1102m@users.noreply.github.com"}
 ]
 readme = "README.md"
-requires-python = ">=3.14"
+requires-python = ">=3.14,<3.15"
 dependencies = [
     "pyqt6 (>=6.10.2,<7.0.0)",
-    "sqlalchemy (>=2.0.47,<3.0.0)"
+    "sqlalchemy (>=2.0.47,<3.0.0)",
+    "pyinstaller (>=6.19.0,<7.0.0)",
+    "scikit-learn (>=1.8.0,<2.0.0)"
 ]
 
 
