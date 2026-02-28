@@ -23,10 +23,21 @@ class CompletenessController:
         if not all_species:
             errors.append("В базе знаний нет ни одного вида китов.")
             return errors
+        
+        properties = self.property_ctrl.get_all()
 
-        if not self.property_ctrl.get_all():
+        if not properties:
             errors.append("В базе знаний нет ни одного свойства.")
             return errors
+        
+        for property in properties:
+            values = self.val_ctrl.get_for_property(property.id)
+
+            if not values:
+                errors.append(
+                    f"Свойство «{property.name}»: множество возможных "
+                    f"значений пусто."
+                )
 
         for species in all_species:
             described = self.desc_ctrl.get_described_properties(species.id)
