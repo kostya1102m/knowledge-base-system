@@ -35,12 +35,14 @@ class SolverWindow(QMainWindow):
 
         top = QHBoxLayout()
         btn_back = QPushButton("← Назад к выбору роли")
+        btn_back.setFixedWidth(50)
         btn_back.setFixedWidth(200)
         btn_back.clicked.connect(self.go_back.emit)
         top.addWidget(btn_back)
         top.addStretch()
         title = QLabel("🐋 Решатель задач — Определение вида кита")
-        title.setFont(QFont("", 14, QFont.Weight.Bold))
+        title.setFont(QFont("Trebuchet MS", 14, QFont.Weight.Bold))
+        title.setFixedHeight(50)
         top.addWidget(title)
         top.addStretch()
         main.addLayout(top)
@@ -109,7 +111,6 @@ class SolverWindow(QMainWindow):
 
         self._load_properties()
 
-
     def _load_properties(self):
         self._clear_layout(self.input_layout)
         self.property_checkboxes = {}
@@ -146,7 +147,6 @@ class SolverWindow(QMainWindow):
             group.setLayout(gl)
             self.input_layout.addWidget(group)
 
-
     def _clear(self):
         for cbs in self.property_checkboxes.values():
             for cb in cbs.values():
@@ -170,31 +170,66 @@ class SolverWindow(QMainWindow):
             )
             return
 
-        results = self.solver_ctrl.solve(user_input)
-        self._display(results)
+        result = self.solver_ctrl.solve(user_input)
+        self._display(result)
 
-
-    def _display(self, results):
+    def _display(self, result: dict):
         self.result_output.clear()
 
-        matched = [r for r in results if r['matched']]
-        rejected = [r for r in results if not r['matched']]
+        all_results = result['all_results']
+        best_species = result['best_species']
+        matched_count = result['matched_count']
+
+        matched = [r for r in all_results if r['matched']]
+        rejected = [r for r in all_results if not r['matched']]
 
         html = (
             "<style>"
             ".match{color:#2E7D32} .reject{color:#C62828} .neutral{color:#616161}"
-            ".name{font-size:15px;font-weight:bold}"
+            ".best{color:#1565C0} .name{font-size:15px;font-weight:bold}"
             ".detail{margin-left:20px;font-size:12px}"
+            ".prob{font-size:11px;color:#555}"
+            ".best-banner{background:#E3F2FD;border:2px solid #1565C0;"
+            "border-radius:8px;padding:12px;margin:8px 0}"
             "hr{border:1px solid #eee}"
             "</style>"
         )
 
         html += "<h2>Результат определения</h2>"
 
+        # ── Баннер ML-рекомендации ──
+        if best_species and matched_count > 1:
+            best_r = next((r for r in matched if r['is_best']), None)
+            prob_pct = f"{best_r['probability'] * 100:.1f}%" if best_r else ""
+            html += (
+                f"<div class='best-banner'>"
+                f"<p class='best'><b>🤖 ML-рекомендация:</b></p>"
+                f"<p class='name best'>⭐ {best_species.name}</p>"
+                f"<p class='prob'>Уверенность модели: {prob_pct}</p>"
+                f"<p class='neutral' style='font-size:11px'>"
+                f"Из {matched_count} подходящих видов модель считает этот наиболее вероятным."
+                f"</p></div>"
+            )
+        elif best_species and matched_count == 1:
+            best_r = next((r for r in matched if r['is_best']), None)
+            prob_pct = f"{best_r['probability'] * 100:.1f}%" if best_r else ""
+            html += (
+                f"<div class='best-banner'>"
+                f"<p class='match'><b>🎯 Единственный подходящий вид:</b></p>"
+                f"<p class='name match'>⭐ {best_species.name}</p>"
+                f"<p class='prob'>Уверенность модели: {prob_pct}</p>"
+                f"</div>"
+            )
+
         if matched:
             html += f"<p class='match'><b>✅ Подходящие виды ({len(matched)}):</b></p>"
             for r in matched:
-                html += f"<p class='name match'>🐋 {r['species'].name}</p>"
+                star = " ⭐" if r['is_best'] else ""
+                prob_pct = f"{r['probability'] * 100:.1f}%"
+                html += (
+                    f"<p class='name match'>🐋 {r['species'].name}{star} "
+                    f"<span class='prob'>({prob_pct})</span></p>"
+                )
                 html += self._fmt_details(r['details'])
                 html += "<hr>"
         else:
@@ -203,10 +238,15 @@ class SolverWindow(QMainWindow):
                 "<p class='neutral'>Измените данные или дополните базу знаний.</p><hr>"
             )
 
+
         if rejected:
             html += f"<p class='reject'><b>❌ Опровергнутые виды ({len(rejected)}):</b></p>"
             for r in rejected:
-                html += f"<p class='name reject'>✗ {r['species'].name}</p>"
+                prob_pct = f"{r['probability'] * 100:.1f}%"
+                html += (
+                    f"<p class='name reject'>✗ {r['species'].name} "
+                    f"<span class='prob'>({prob_pct})</span></p>"
+                )
                 html += self._fmt_details(r['details'])
                 html += "<hr>"
 
@@ -239,12 +279,13 @@ class SolverWindow(QMainWindow):
 
     def refresh_data(self):
         self.session.expire_all()
+        self.solver_ctrl.retrain()
         self._load_properties()
         self.result_output.clear()
 
     def _bold_label(self, text):
         lbl = QLabel(text)
-        lbl.setFont(QFont("", 12, QFont.Weight.Bold))
+        lbl.setFont(QFont("Trebuchet MS", 12, QFont.Weight.Bold))
         return lbl
 
     def _clear_layout(self, layout):

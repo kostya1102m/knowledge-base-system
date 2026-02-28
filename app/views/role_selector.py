@@ -20,13 +20,13 @@ class RoleSelectorView(QWidget):
 
         title = QLabel("Система классификации\nкитообразных")
         title.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        f = QFont(); f.setPointSize(18); f.setBold(True)
+        f = QFont("Trebuchet MS"); f.setPointSize(18); f.setBold(True)
         title.setFont(f)
         layout.addWidget(title)
 
         sub = QLabel("Выберите режим работы:")
         sub.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        sf = QFont(); sf.setPointSize(12)
+        sf = QFont("Trebuchet MS"); sf.setPointSize(12)
         sub.setFont(sf)
         layout.addWidget(sub)
 

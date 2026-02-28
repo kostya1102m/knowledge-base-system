@@ -30,7 +30,7 @@ class AssignmentTab(QWidget):
         layout = QVBoxLayout(self)
 
         lbl = QLabel("Значения свойств для вида кита")
-        lbl.setFont(QFont("", 12, QFont.Weight.Bold))
+        lbl.setFont(QFont("Trebuchet MS", 12, QFont.Weight.Bold))
         layout.addWidget(lbl)
 
         row = QHBoxLayout()

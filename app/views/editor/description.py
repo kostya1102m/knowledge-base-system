@@ -26,7 +26,7 @@ class DescriptionTab(QWidget):
         layout = QVBoxLayout(self)
 
         lbl = QLabel("Описание свойств вида")
-        lbl.setFont(QFont("", 12, QFont.Weight.Bold))
+        lbl.setFont(QFont("Trebuchet MS", 12, QFont.Weight.Bold))
         layout.addWidget(lbl)
 
         splitter = QSplitter(Qt.Orientation.Horizontal)

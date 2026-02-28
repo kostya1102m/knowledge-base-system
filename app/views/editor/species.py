@@ -18,7 +18,7 @@ class SpeciesTab(QWidget):
         layout = QVBoxLayout(self)
 
         lbl = QLabel("Управление видами китов")
-        lbl.setFont(QFont("", 12, QFont.Weight.Bold))
+        lbl.setFont(QFont("Trebuchet MS", 12, QFont.Weight.Bold))
         layout.addWidget(lbl)
 
         row = QHBoxLayout()
