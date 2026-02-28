@@ -7,7 +7,10 @@ from controllers.ml_classifier import MLClassifier
 
 
 class SolverController:
-    #решатель задач — метод опровержения гипотез.
+    #решатель задач — метод опровержения гипотез (логический фильтр + ML-ранжирование:
+    # 1. логический фильтр (метод опровержения гипотез) — отсеивает невозможные виды
+    # 2. ml-классификатор — из оставшихся выбирает наиболее вероятный
+    # ).
     #Для каждого вида проверяем: все ли введённые пользователем значения
     #совместимы с допустимыми значениями этого вида.
     #если хотя бы одно свойство не совпадает — вид опровергнут.
@@ -17,9 +20,16 @@ class SolverController:
         self.species_ctrl = SpeciesController(session)
         self.desc_ctrl = DescriptionController(session)
         self.assign_ctrl = AssignmentController(session)
+        self.ml = MLClassifier(session)
 
-    def solve(self, user_input: dict[int, list[int]]) -> list[dict]:
-        results = []
+        self.ml.train()
+
+    def retrain(self):
+        self.ml.train()
+
+    def solve(self, user_input: dict[int, list[int]]) -> dict:
+        all_results = []
+        matched_ids = []
 
         for species in self.species_ctrl.get_all():
             described = self.desc_ctrl.get_described_properties(species.id)
@@ -63,11 +73,37 @@ class SolverController:
                     'note': ''
                 })
 
-            results.append({
+            if matched:
+                matched_ids.append(species.id)
+
+            all_results.append({
                 'species': species,
                 'matched': matched,
+                'probability': 0.0,
+                'is_best': False,
                 'details': details
             })
 
-        results.sort(key=lambda r: (not r['matched'], r['species'].name))
-        return results
+        best_id, probabilities = self.ml.pick_best(matched_ids, user_input)
+
+        for r in all_results:
+            sid = r['species'].id
+            r['probability'] = probabilities.get(sid, 0.0)
+            r['is_best'] = (sid == best_id)
+
+        all_results.sort(key=lambda r: (
+            not r['matched'],       
+            not r['is_best'],       
+            -r['probability'],      
+            r['species'].name
+        ))
+
+        best_species = None
+        if best_id is not None:
+            best_species = self.session.get(Species, best_id)
+
+        return {
+            'all_results': all_results,
+            'best_species': best_species,
+            'matched_count': len(matched_ids)
+        }
