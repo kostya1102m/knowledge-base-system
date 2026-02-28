@@ -5,3 +5,4 @@ from controllers.description import DescriptionController
 from controllers.assignment import AssignmentController
 from controllers.completeness import CompletenessController
 from controllers.solver import SolverController
+from controllers.ml_classifier import MLClassifier
