@@ -36,13 +36,13 @@ class CompletenessTab(QWidget):
         if not errors:
             self.output.setStyleSheet("color:green;font-size:13px;")
             self.output.setText(
-                "✅ База знаний полна.\n\n"
+                "База знаний полна.\n\n"
                 "Все виды имеют описания свойств, все свойства имеют "
                 "заданные значения, все значения корректны."
             )
         else:
             self.output.setStyleSheet("color:red;font-size:13px;")
-            lines = ["❌ Обнаружены проблемы:\n"]
+            lines = ["Обнаружены проблемы:\n"]
             for i, e in enumerate(errors, 1):
                 lines.append(f"{i}. {e}\n")
             self.output.setText("\n".join(lines))

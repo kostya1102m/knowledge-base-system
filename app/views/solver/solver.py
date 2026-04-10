@@ -40,7 +40,7 @@ class SolverWindow(QMainWindow):
         btn_back.clicked.connect(self.go_back.emit)
         top.addWidget(btn_back)
         top.addStretch()
-        title = QLabel("🐋 Решатель задач — Определение вида кита")
+        title = QLabel("Решатель задач — Определение вида кита")
         title.setFont(QFont("Trebuchet MS", 14, QFont.Weight.Bold))
         title.setFixedHeight(50)
         top.addWidget(title)
@@ -72,7 +72,7 @@ class SolverWindow(QMainWindow):
         ll.addWidget(scroll)
 
         btns = QHBoxLayout()
-        btn_solve = QPushButton("🔍 Определить вид")
+        btn_solve = QPushButton("Определить вид")
         btn_solve.setFixedHeight(40)
         btn_solve.setStyleSheet(
             "QPushButton{background:#4CAF50;color:white;font-size:14px;"
@@ -203,8 +203,8 @@ class SolverWindow(QMainWindow):
             prob_pct = f"{best_r['probability'] * 100:.1f}%" if best_r else ""
             html += (
                 f"<div class='best-banner'>"
-                f"<p class='best'><b>🤖 ML-рекомендация:</b></p>"
-                f"<p class='name best'>⭐ {best_species.name}</p>"
+                f"<p class='best'><b> ML-рекомендация:</b></p>"
+                f"<p class='name best'> <b>{best_species.name}</b></p>"
                 f"<p class='prob'>Уверенность модели: {prob_pct}</p>"
                 f"<p class='neutral' style='font-size:11px'>"
                 f"Из {matched_count} подходящих видов модель считает этот наиболее вероятным."
@@ -215,19 +215,19 @@ class SolverWindow(QMainWindow):
             prob_pct = f"{best_r['probability'] * 100:.1f}%" if best_r else ""
             html += (
                 f"<div class='best-banner'>"
-                f"<p class='match'><b>🎯 Единственный подходящий вид:</b></p>"
-                f"<p class='name match'>⭐ {best_species.name}</p>"
+                f"<p class='match'><b> Единственный подходящий вид:</b></p>"
+                f"<p class='name match'> {best_species.name}</p>"
                 f"<p class='prob'>Уверенность модели: {prob_pct}</p>"
                 f"</div>"
             )
 
         if matched:
-            html += f"<p class='match'><b>✅ Подходящие виды ({len(matched)}):</b></p>"
+            html += f"<p class='match'><b> Подходящие виды ({len(matched)}):</b></p>"
             for r in matched:
-                star = " ⭐" if r['is_best'] else ""
+                star = "!!!" if r['is_best'] else ""
                 prob_pct = f"{r['probability'] * 100:.1f}%"
                 html += (
-                    f"<p class='name match'>🐋 {r['species'].name}{star} "
+                    f"<p class='name match'>{r['species'].name}{star} "
                     f"<span class='prob'>({prob_pct})</span></p>"
                 )
                 html += self._fmt_details(r['details'])
@@ -240,7 +240,7 @@ class SolverWindow(QMainWindow):
 
 
         if rejected:
-            html += f"<p class='reject'><b>❌ Опровергнутые виды ({len(rejected)}):</b></p>"
+            html += f"<p class='reject'><b> Опровергнутые виды ({len(rejected)}):</b></p>"
             for r in rejected:
                 prob_pct = f"{r['probability'] * 100:.1f}%"
                 html += (
